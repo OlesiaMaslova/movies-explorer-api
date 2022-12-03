@@ -1,4 +1,3 @@
-/* eslint-disable consistent-return */
 const Movie = require('../models/movie');
 const AccessDeniedError = require('../errors/AccessDeniedError');
 const BadRequestError = require('../errors/BadRequestError');
@@ -23,7 +22,7 @@ async function createMovie(req, res, next) {
       year,
       description,
       image,
-      trailerLink,
+      trailer,
       nameRU,
       nameEN,
       thumbnail,
@@ -36,14 +35,14 @@ async function createMovie(req, res, next) {
       year,
       description,
       image,
-      trailerLink,
+      trailer,
       nameRU,
       nameEN,
       thumbnail,
       movieId,
       owner: req.user._id,
     }).save();
-    res.status(200).send(movie);
+    return res.status(200).send(movie);
   } catch (err) {
     if (err.name === 'ValidationError') {
       return next(new BadRequestError('Некорректные данные'));

@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 const router = require('express').Router();
 const userRouter = require('./users');
 const movieRouter = require('./movies');
@@ -14,7 +13,7 @@ router.post('/signin', AuthorizationValidator, login);
 router.use(auth);
 router.use('/', userRouter);
 router.use('/', movieRouter);
-router.use('*', (req, res) => {
+router.use('*', () => {
   throw new NotFoundError('Запрашиваемая страница не найдена');
 });
 

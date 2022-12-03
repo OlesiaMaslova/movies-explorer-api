@@ -1,4 +1,3 @@
-/* eslint-disable consistent-return */
 const jwt = require('jsonwebtoken');
 const AuthError = require('../errors/AuthError');
 const { JWT_SECRET, NODE_ENV } = require('../config');
@@ -16,7 +15,7 @@ function auth(req, res, next) {
     return next(new AuthError('Необходима авторизация'));
   }
   req.user = payload;
-  next();
+  return next();
 }
 
 module.exports = {

@@ -1,4 +1,3 @@
-/* eslint-disable consistent-return */
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
@@ -16,7 +15,7 @@ async function getUserInfo(req, res, next) {
     }
     return res.status(200).send(user);
   } catch (err) {
-    next(err);
+    return next(err);
   }
 }
 
@@ -33,7 +32,10 @@ async function updateUserInfo(req, res, next) {
     if (err.name === 'ValidationError') {
       next(new BadRequestError('Ошибка валидации'));
     }
-    next(err);
+    if (err.code === 11000) {
+      return next(new DuplicatedValueError('Такой email уже зарегистрирован'));
+    }
+    return next(err);
   }
 }
 
@@ -42,10 +44,10 @@ async function createUser(req, res, next) {
     const { email, password, name } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await new User({ email, password: hashedPassword, name }).save();
-    res.status(200).send({ email: user.email, name: user.name });
+    return res.status(200).send({ email: user.email, name: user.name });
   } catch (err) {
     if (err.code === 11000) {
-      return next(new DuplicatedValueError('Такой email уже зарегестрирован'));
+      return next(new DuplicatedValueError('Такой email уже зарегистрирован'));
     }
     return next(err);
   }
@@ -63,9 +65,6 @@ async function login(req, res, next) {
       return next(new AuthError('Неверные почта или пароль'));
     }
     const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4cCI6MTY2OTg3OTQ5MiwiaWF0IjoxNjY5ODc5NDkyfQ.hfygoNqljHro7HFJVzeEcoiy7EE-mmxw3e25rNK2gxM', { expiresIn: '7d' });
-    if (!token) {
-      return next(new AuthError('Некорректный токен'));
-    }
     return res.status(200).send({ token });
   } catch (err) {
     return next(err);

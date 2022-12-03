@@ -1,5 +1,6 @@
-/* eslint-disable linebreak-style */
+require('dotenv').config();
 const express = require('express');
+const helmet = require('helmet');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { errors } = require('celebrate');
@@ -8,6 +9,7 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { PORT, DB_ADDRESS } = require('./config');
 
 const app = express();
+app.use(helmet());
 app.use(bodyParser.json());
 app.use(requestLogger);
 app.use(router);
